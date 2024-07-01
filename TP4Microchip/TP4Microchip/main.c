@@ -17,14 +17,12 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-static uint8_t rojo;
-
-volatile uint8_t RX_Buffer=0;		// Variable que se modificará cuando se atienda la interrupción
-volatile uint8_t flagFin=0;			// Variable que se modificará cuando se atienda la interrupción
+volatile uint8_t rojo;
+volatile uint8_t col=0;		// Variable que se modificará cuando se atienda la interrupción
 
 ISR(USART_RX_vect){
-	RX_Buffer = UDR0; //la lectura del UDR borra flag RXC
-	switch (RX_Buffer) {
+	col = UDR0; //la lectura del UDR borra flag RXC
+	switch (col) {
 		case 'R':
 			//Modificar rojo
 			rojo=255; 
@@ -44,7 +42,6 @@ ISR(USART_RX_vect){
 		verde=0;
 		break;
 	}
-	RX_Buffer=0;
 }
 
 int main(void)
@@ -79,13 +76,28 @@ int main(void)
 			c=0;
 			rojo= (rojo+1) % 256;
 		}
+		*/
+		switch(col){
+			case 'R':
+			//Modificar rojo
+			
+			break;
+			case 'G':
+			//Modificar verde
+			
+			break;
+			case 'B':
+			//Modificar azul
+			
+			break;
+		}
 		if(rojo < TCNT1 ){
 			PORTB |= (1<<PORTB5);
 		}else{
 			PORTB &= ~(1<<PORTB5);
 		}
-		_delay_us(1);
-		*/
+		//_delay_us(1);
+		
     }
 }
 
