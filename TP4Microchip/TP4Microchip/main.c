@@ -17,30 +17,20 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-volatile uint8_t rojo;
-volatile uint8_t col=0;		// Variable que se modificará cuando se atienda la interrupción
+static uint8_t rojo,auxiliar;
+volatile uint8_t col=0;		// Variable que se modificarï¿½ cuando se atienda la interrupciï¿½n
+volatile uint8_t aux;
 
 ISR(USART_RX_vect){
-	col = UDR0; //la lectura del UDR borra flag RXC
-	switch (col) {
-		case 'R':
-			//Modificar rojo
-			rojo=255; 
-			azul=0;
-			verde=0;
-		break;
-		case 'G':
-		//Modificar verde
-		rojo=0;
-		azul=0;
-		verde=255;
-		break;
-		case 'B':
-		//Modificar azul
-		rojo=0;
-		azul=255;
-		verde=0;
-		break;
+	aux = UDR0; //la lectura del UDR borra flag RXC
+	if (aux == 'R' || aux == 'G' || aux == 'B'){
+		col = aux;
+	} else if (aux == 'r' || aux == 'g' || aux == 'b'){
+		col = aux - 32;
+	} else {
+		SerialPort_Send_String("Caracter no valido. Seleccione 'R', 'r', 'G', 'g', 'B' o 'b' para modificar los colores del LED. \r\n");
+		SerialPort_Send_Data(aux);
+		col = 0;
 	}
 }
 
@@ -51,44 +41,49 @@ int main(void)
 	SerialPort_TX_Enable();																											// Activo el Transmisor del Puerto Serie (1<<TXEN0) en UCSR0B
 	SerialPort_RX_Enable();																											// Activo el Receptor del Puerto Serie	(1<<RXEN0) en UCSR0B
 	SerialPort_RX_Interrupt_Enable();
-	SerialPort_Send_String("¡Bienvenido! Seleccione 'R' 'G' o 'B' para modificar los colores del LED. \r\n");
+	sei();
+	SerialPort_Send_String("Bienvenido al sistema. Seleccione 'R', 'r', 'G', 'g', 'B' o 'b' para modificar los colores del LED. \r\n");
+
+
+	// ConfiguraciÃ³n del ADC:
+	DDRC &= ~(1 << PORTC3);								  // Configuro el pin PC3 (ADC3) como entrada
+	ADMUX |= (1 << MUX0) | (1 << MUX1);					  // Selecciono el canal 3 del ADC
+	ADMUX |= (1 << REFS0);								  // Configuro el ADC para que trabaje con el voltaje de referencia AVCC
+	ADMUX |= (1 << ADLAR);								  // Configuro el ADC para que la salida sea izquierda justificada (8 bits) el resultado estarÃ¡ en ADCH
+	ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Configuro el preescalador del ADC para que trabaje a 125kHz
+	ADCSRA |= (1 << ADATE);								  // Habilito el modo de disparo automÃ¡tico
+	ADCSRA |= (1 << ADEN);								  // Habilito el ADC
 	
-	
+	DIDR0= 0x01;			//Deshabilita algo REVISAR
 	
 	TCCR1A |= (1<<WGM10);		//Modo Fast PWM 8-Bit
 	TCCR1B |= (1<<CS12);		//Prescaler 256
 	TCCR1A |= (1<<COM1B1) | (1<<COM1A1) | (1<<COM1B0) | (1<<COM1A0);		//Modo invertido
-	azul = 250;				//Valor Azul
-	verde = 20;					//Valor Verde
+	azul = 0;				//Valor Azul
+	verde = 255;					//Valor Verde
 	
 	DDRB |= (1<<PORTB1) | (1<<PORTB2) | (1<<PORTB5);
-	DDRB &= ~(1<<PORTC3);
+	//DDRB &= ~(1<<PORTC3);
 	
-	rojo=2;
-	uint16_t c=0;
-	
-	sei();
-	
+	rojo=0;
+	//uint16_t c=0;
+	ADCSRA |= (1<<ADSC);
     while (1) 
     {
-		/*
-		if(++c>1000){
-			c=0;
-			rojo= (rojo+1) % 256;
-		}
-		*/
+		if((ADCSRA&(1<<ADIF))){
+			auxiliar=ADCH;
+			ADCSRA |= (1<<ADIF); //borrar flag
+			ADCSRA |= (1<<ADSC);//start conversion
+		}//wait for conversion to finish	
 		switch(col){
 			case 'R':
-			//Modificar rojo
-			
+			rojo = auxiliar;
 			break;
 			case 'G':
-			//Modificar verde
-			
+			verde = auxiliar;
 			break;
 			case 'B':
-			//Modificar azul
-			
+			azul = auxiliar;
 			break;
 		}
 		if(rojo < TCNT1 ){
@@ -96,7 +91,6 @@ int main(void)
 		}else{
 			PORTB &= ~(1<<PORTB5);
 		}
-		//_delay_us(1);
 		
     }
 }
