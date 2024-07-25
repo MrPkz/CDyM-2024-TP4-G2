@@ -7,7 +7,7 @@
 
 #include "main.h"
 
-static uint8_t pos,posprev;
+static uint8_t pos;
 volatile uint8_t col=0;		// Variable que se modificar� cuando se atienda la interrupci�n
 volatile uint8_t aux;
 
@@ -62,10 +62,7 @@ int main(void)
 	
     while (1){
 		pos=ObtenerValor();
-		if(posprev!=pos){
-			CambiarColor(col,pos);
-			posprev=pos;
-		}
+		CambiarColor(col,pos);
 		UpdateRojo();
 		
     }
