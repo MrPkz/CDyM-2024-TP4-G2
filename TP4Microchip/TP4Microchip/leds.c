@@ -7,7 +7,7 @@ static uint8_t rojo;
 
 void IniciarTimers(void){
 	TCCR1B |= (1<<CS12);																//Setea Prescaler en 256
-	TCCR1A |= (1<<WGM10) | (1<<COM1B1) | (1<<COM1A1) | (1<<COM1B0) | (1<<COM1A0);		//Setea el Modo invertido (COM1A/B) Fast PWM 8-bit (WGM)
+	TCCR1A |= (1<<WGM10) | (1<<COM1B1) | (1<<COM1A1) | (1<<COM1B0) | (1<<COM1A0);		//Setea el Modo invertido (COM1A/B) en modo Fase Correcta de 8 bits (WGM)
 	//Inicialmente, la luz será blanca
 	azul = 255;																			//Indica Valor Azul
 	verde = 255;																		//Indica Valor Verde
