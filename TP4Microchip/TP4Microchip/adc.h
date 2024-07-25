@@ -1,10 +1,5 @@
-/*
- * adc.h
- *
- * Created: 25/7/2024 16:50:56
- *  Author: perei
- */ 
 
+/*Author: Ramiro Madera y Ulises Pereira*/
 
 #ifndef ADC_H_
 #define ADC_H_

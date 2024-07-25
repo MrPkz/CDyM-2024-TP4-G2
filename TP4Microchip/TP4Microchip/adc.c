@@ -1,31 +1,26 @@
-/*
- * adc.c
- *
- * Created: 25/7/2024 16:50:43
- *  Author: perei
- */ 
+
+/*Author: Ramiro Madera y Ulises Pereira*/
 
 #include "adc.h"
 
-static uint8_t valoractual;
+static uint8_t valoractual;		//Variable donde se rescatará el valor del ADC
 
-void ConfigurarADC(void){
-	// Configuración del ADC:
-	ADMUX |= (1 << MUX0) | (1 << MUX1);					  // Selecciono el canal 3 del ADC
-	ADMUX |= (1 << REFS0);								  // Configuro el ADC para que trabaje con el voltaje de referencia AVCC
-	ADMUX |= (1 << ADLAR);								  // Configuro el ADC para que la salida sea izquierda justificada (8 bits) el resultado estará en ADCH
-	ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Configuro el preescalador del ADC para que trabaje a 125kHz
-	ADCSRA |= (1 << ADATE);								  // Habilito el modo de disparo automático
-	ADCSRA |= (1 << ADEN);								  // Habilito el ADC
-	
-	DIDR0= 0x01;			//Deshabilita algo REVISAR
-	ADCSRA |= (1<<ADSC);								//Manda Conversion Inicial
+void ConfigurarADC(void){	// Configuración del ADC
+	ADMUX |= (1 << MUX0) | (1 << MUX1) | (1 << REFS0) | (1 << ADLAR);					  
+	// Selecciona el canal 3 del ADC (MUX1,MUX0) para que trabaje con el voltaje de referencia a VCC (REFS0) y para que la salida se justifique a la izquierda (ADLAR).
+	//De este modo, la salida se encontrará justificada en ADCH
+	ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0) | (1 << ADATE) | (1 << ADEN); 
+	// Configuro el preescalador del ADC para que trabaje a 125kHz (ADPS), habilitando el ADC (ADEN) con su modo de disparo automático (ADATE).
+	DIDR0 |= (1 << ADC3D);			
+	//Deshabilita la entrada digital del puerto ADC3 haciendo que únicamente funcione en modo analógico.
+	ADCSRA |= (1<<ADSC);
+	//Manda la instrucción para convertir el primer valor medido por el ADC.
 }
 
 uint8_t ObtenerValor(void){
-	while(!(ADCSRA&(1<<ADIF))){}		//wait for conversion to finish
-	valoractual=ADCH;
-	ADCSRA |= (1<<ADIF); //borrar flag
-	ADCSRA |= (1<<ADSC);//start conversion
-	return valoractual;
+	while(!(ADCSRA&(1<<ADIF))){}		//Espera a que el flag ADIF sea 1, indicando que la conversión del valor a medir está completa.
+	valoractual=ADCH;					//Guarda el valor del ADC
+	ADCSRA |= (1<<ADIF);				//Borra flag ADIF	
+	ADCSRA |= (1<<ADSC);				//Comienza una nueva conversión
+	return valoractual;					//Devuelve el valor actual
 }

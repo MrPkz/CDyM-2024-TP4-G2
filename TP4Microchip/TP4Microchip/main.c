@@ -1,18 +1,15 @@
-/*
- * TP4Microchip.c
- *
- * Created: 1/7/2024 14:16:21
- * Author : Perei
- */ 
+
+/*Author: Ramiro Madera y Ulises Pereira*/
 
 #include "main.h"
 
 static uint8_t pos;
-volatile uint8_t col=0;		// Variable que se modificar� cuando se atienda la interrupci�n
-volatile uint8_t aux;
+volatile uint8_t col=0, aux;		// Variables que se modificarán cuando se atienda las interrupciones
+//En aux guarda el caracter leído, en pos el caracter en mayúscula de ser válido
 
 ISR(USART_RX_vect){
 	aux = UDR0; //la lectura del UDR borra flag RXC
+	//Se procesa el caracter de forma case-sensitive
 	if (aux == 'R' || aux == 'G' || aux == 'B' || aux == 'S'){
 		col = aux;
 		switch(aux){
@@ -45,9 +42,8 @@ ISR(USART_RX_vect){
 			SistemaPausado();
 			break;
 		}
-	} else {
+	} else {		//De ser el caracter válido, se notifica de ello y queda la selección en el estado previo
 		CaracterInvalido();
-		col = 0;
 	}
 }
 
@@ -64,7 +60,6 @@ int main(void)
 		pos=ObtenerValor();
 		CambiarColor(col,pos);
 		UpdateRojo();
-		
     }
 }
 
