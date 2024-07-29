@@ -1,2 +1,2 @@
 Repositorio con la resolución del Grupo 2 al TP4 de la asignatura "E0304-Circuitos Digitales y Microcontroladores", año 2024.
-Se debe compilar y construir el proyecto para poder ejecutarlo, no se incluyen los archivos de debug en el repositorio.
+Se incluyen los archivos de debug para poder correr el proyecto en Proteus, así como el Proteus correspondiente al proyecto.
