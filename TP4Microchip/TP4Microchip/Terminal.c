@@ -28,6 +28,11 @@ void IniciarTerminal(void){						//Muestra Mnesaje de Bienvenida
 	MostrarMenu();
 }
 
+uint8_t LeerCaracter(void){
+	uint8_t aux = UDR0; //la lectura del UDR borra flag RXC
+	return aux;
+}
+
 void ColorSeleccionado(char * s){				//Muestra color seleccionado
 	SerialPort_Send_String("Estas modificando el color ");
 	SerialPort_Wait_For_TX_Buffer_Free();

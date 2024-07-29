@@ -4,8 +4,6 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#define F_CPU 16000000UL
-
 //Inclusión de los Headers de los módulos del proyecto
 #include "globalheader.h"
 #include "terminal.h"

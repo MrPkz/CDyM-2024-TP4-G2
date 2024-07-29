@@ -8,7 +8,7 @@ volatile uint8_t col=0, aux;		// Variables que se modificarán cuando se atienda
 //En aux guarda el caracter leído, en pos el caracter en mayúscula de ser válido
 
 ISR(USART_RX_vect){
-	aux = UDR0; //la lectura del UDR borra flag RXC
+	aux = LeerCaracter();
 	//Se procesa el caracter de forma case-sensitive
 	if (aux == 'R' || aux == 'G' || aux == 'B' || aux == 'S'){
 		col = aux;

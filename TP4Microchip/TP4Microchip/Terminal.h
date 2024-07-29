@@ -10,6 +10,7 @@
 
 void ConfigurarTerminal8a1(void);
 void IniciarTerminal(void);
+uint8_t LeerCaracter(void);
 void ColorSeleccionado(char *);
 void SistemaPausado(void);
 void CaracterInvalido(void);
